@@ -1,0 +1,188 @@
+<template>
+	<p class="slds-p-horizontal_medium slds-var-p-top_small slds-hyphenate">
+		How would you like to calculate the amount of time to shift the records?
+	</p>
+	<div class="slds-var-p-vertical_small slds-p-horizontal_medium slds-align_absolute-center">
+		<lightning-radio-group
+			name="howToShift"
+			label="Select a method for choosing the amount of time to shift"
+			options={shiftOptions}
+			value="byData"
+			type="button"
+			variant="label-hidden"
+			onchange={handleHowToShift}
+		>
+		</lightning-radio-group>
+	</div>
+
+	<template if:true={shiftByMinutes}>
+		<lightning-layout class="slds-p-bottom_medium" horizontal-align="spread" vertical-align="end">
+			<lightning-layout-item size="2" padding="horizontal-medium">
+				<lightning-input
+					class="dayminuteinput"
+					type="number"
+					name="daysToShift"
+					label="Days"
+					value="0"
+					oncommit={handleDaysInput}
+				>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="horizontal-medium">
+				<lightning-input
+					class="dayminuteinput"
+					type="number"
+					name="hoursToShift"
+					label="Hours"
+					value="0"
+					oncommit={handleHoursInput}
+				>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="2" padding="horizontal-medium">
+				<lightning-input
+					class="dayminuteinput"
+					type="number"
+					name="minutesToShift"
+					label="Minutes"
+					value="0"
+					oncommit={handleMinutesInput}
+				>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="6" padding="horizontal-medium">
+				<lightning-radio-group
+					name="forwardBackward"
+					label="Forward or Backward"
+					options={forwardBackwardOptions}
+					type="button"
+					value="forward"
+					variant="label-hidden"
+					onchange={handleForwardBackwardInput}
+				>
+				</lightning-radio-group>
+			</lightning-layout-item>
+		</lightning-layout>
+	</template>
+
+	<template if:true={shiftByReference}>
+		<lightning-layout>
+			<lightning-layout-item size="6" padding="around-medium">
+				<lightning-combobox
+					name="object"
+					label="Select an Object on Which to Base the Date Shift"
+					options={orgObjectList}
+					value={objectApiName}
+					placeholder="Select an object"
+					disabled={objectSelectorDisabled}
+					onchange={handleObjectChange}
+				>
+				</lightning-combobox>
+				<lightning-combobox
+					name="field"
+					data-id="field"
+					label="Select a DateTime field within the Object"
+					options={fieldList}
+					value={fieldApiName}
+					placeholder="Select a field"
+					disabled={fieldSelectorDisabled}
+					onchange={handleFieldChange}
+					class="slds-var-p-top_medium"
+				>
+				</lightning-combobox>
+			</lightning-layout-item>
+			<lightning-layout-item size="6" padding="around-medium">
+				<lightning-input
+					type="datetime"
+					date-style="long"
+					value={dateOfDemo}
+					onchange={handleDateChange}
+					label="Choose a Date and Time for Your Demo or Dry Run"
+				>
+				</lightning-input>
+				<div class="slds-var-p-top_medium">
+					<lightning-input
+						type="toggle"
+						label="Save the object and field selections for future use"
+						checked={savedSettingsFound}
+						disabled={saveSelectionToggleDisabled}
+						message-toggle-active="Saved"
+						message-toggle-inactive="Not saved"
+						onchange={handleSaveSettingsButton}
+					>
+					</lightning-input>
+				</div>
+			</lightning-layout-item>
+		</lightning-layout>
+	</template>
+
+	<template if:true={shiftAmountVisible}>
+		<div class="slds-var-p-horizontal_medium">
+			<section class="slds-box slds-theme_shade">
+				<p class="slds-text-title_caps">
+					Here is what will happen:
+				</p>
+				<template if:true={shiftByReference}>
+					<p class="slds-var-p-top_small slds-hyphenate">
+						The difference between the most recent&nbsp;
+						<span class="slds-text-font_monospace">{fieldApiName}</span> &nbsp;field of the&nbsp;
+						<span class="slds-text-font_monospace">{objectApiName}</span> &nbsp;object in your org (
+						<lightning-formatted-date-time
+							value={mostRecent}
+							year="numeric"
+							day="2-digit"
+							month="2-digit"
+							hour="numeric"
+							minute="2-digit"
+						>
+						</lightning-formatted-date-time>
+						) and the date and time you have selected (
+						<lightning-formatted-date-time
+							value={dateOfDemo}
+							year="numeric"
+							day="2-digit"
+							month="2-digit"
+							hour="numeric"
+							minute="2-digit"
+						>
+						</lightning-formatted-date-time>
+						) is&nbsp;
+						<strong>
+							<lightning-formatted-number value={minutesToShift} class="slds-text-color_destructive">
+							</lightning-formatted-number>
+						</strong>
+						&nbsp;minutes. So ...
+					</p>
+				</template>
+				<ul class="slds-var-p-top_small slds-list_dotted slds-hyphenate">
+					<li>
+						All&nbsp; <span class="slds-text-font_monospace">DateTime</span> &nbsp;fields in all records for each of the
+						objects in the list below will be shifted <strong> {forBack} </strong> by&nbsp;
+						<strong>
+							<lightning-formatted-number value={minutesToShift} class="slds-text-color_destructive">
+							</lightning-formatted-number>
+						</strong>
+						&nbsp;minutes. If the <strong>Adjust Minutes</strong> checkbox for the object is unchecked, then the&nbsp;
+						<span class="slds-text-font_monospace">DateTime</span> fields will be shifted by the nearest number of whole
+						days.
+					</li>
+					<li>
+						All&nbsp; <span class="slds-text-font_monospace">Date</span> &nbsp;fields in all records for each of the
+						objects in the list below will be shifted <strong> {forBack} </strong> by&nbsp;
+						<strong>
+							<lightning-formatted-number value={daysToShift} class="slds-text-color_destructive">
+							</lightning-formatted-number>
+						</strong>
+						&nbsp;days.
+					</li>
+					<li>
+						If the <strong> Weekdays Only </strong> checkbox for the object is checked, then the shifted dates will be
+						further adjusted so that they do not fall on weekends. If the shifted date falls on a Saturday, it will be
+						further adjusted one whole day to fall on the previous Friday; if the shifted date falls on a Sunday, it
+						will be further adjusted one whole day to fall on the following Monday.
+					</li>
+				</ul>
+			</section>
+		</div>
+	</template>
+</template>
