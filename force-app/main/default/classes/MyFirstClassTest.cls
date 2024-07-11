@@ -7,6 +7,6 @@ public class MyFirstClassTest {
         String message = MyFirstClass.greeting();
         System.assertEquals(message, 'Hey! Happy to see you','Received the Message');
         Test.stopTest();
-        
+
     }
 }
