@@ -164,7 +164,7 @@
         <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Date Shift Objects</pluralLabel>
-    <searchLayouts/>
+    <searchLayouts></searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

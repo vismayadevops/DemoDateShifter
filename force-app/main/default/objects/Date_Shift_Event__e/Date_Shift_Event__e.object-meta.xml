@@ -4,4 +4,5 @@
     <eventType>HighVolume</eventType>
     <label>Date Shift Event</label>
     <pluralLabel>Date Shift Events</pluralLabel>
+    <publishBehavior>PublishImmediately</publishBehavior>
 </CustomObject>
