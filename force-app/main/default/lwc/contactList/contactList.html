@@ -1,0 +1,51 @@
+<template>
+    <lightning-card  title="Related Contacts">
+        <template lwc:if={contactExists}>
+            <template for:each={contactList} for:item="contact">
+                <div key={contact.Id} class="slds-p-around_medium">
+                    <lightning-tile class="lgc-bg">
+                        <lightning-layout>
+                            <lightning-layout-item padding="around-small">
+                                <div class="header-column">
+                                    <p class="field-title" title="Field 1">Name</p>
+                                    <p>{contact.Name}</p>
+                                </div>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small">
+                                <div class="header-column">
+                                    <p class="field-title" title="Field 1">Email</p>
+                                    <p>{contact.Email}</p>
+                                </div>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small">
+                                <div class="header-column">
+                                    <p class="field-title" title="Field 1">Phone</p>
+                                    <p>{contact.Phone}</p>
+                                </div>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="around-small">
+                                <div class="header-column">
+                                    <p class="field-title" title="Field 1">Department</p>
+                                    <p>{contact.Department}</p>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-tile>
+                </div>
+            </template>
+        </template>
+        <template lwc:else>
+            <div class="slds-region_narrow">
+                <div class="slds-notify_container slds-is-relative">
+                  <div class="slds-notify slds-notify_toast slds-theme_info" role="status">
+                    <span class="slds-assistive-text">info</span>
+                    <div class="slds-notify__content">
+                      <h2 class="slds-text-heading_small">No related contacts found !</h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </template>
+        
+    </lightning-card>
+</template>
