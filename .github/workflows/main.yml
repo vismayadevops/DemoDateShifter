@@ -1,0 +1,35 @@
+name: Build and Deploy Salesforce Elements to Org #Author: vismayadevops/Jul-2024
+on:
+  push:
+    branches: [ Dev, INT, UAT, main ]
+  workflow_dispatch:
+
+jobs:
+  DEV-deploy:
+    runs-on: ubuntu-latest
+    if: endsWith(github.ref, 'Dev')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install SFDX CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authorize SF Org
+        run: |
+          sfdx force:auth:jwt:grant --clientid 3MVG9BriLgWNwNOSNV9MyNQCx8I7rL3Ugx_HklB3wrL34ihBm.e0ubVoVlKaB0Jy8Jb5LwEvc4rfajQhO9PEL --jwtkeyfile ./buildfiles/server.key --username vismaya.v@milestone.tech.main.dev --instanceurl https://test.salesforce.com -a Dev
+
+      - name: Convert to Deploy Source
+        run: sfdx force:source:convert -r ./force-app -d ./toDeploy
+
+      - name: Run Validation on Deploy Source
+        run: sfdx force:source:deploy -c -x manifest/package.xml -u Dev
+
+      - name: Deploy to SF Org
+        run: sfdx force:source:deploy -x manifest/package.xml -u Dev
