@@ -1,4 +1,4 @@
-name: Build and Deploy Salesforce Elements to Org #Author: vismayadevops/Jul-2024
+name: Build and Deploy Salesforce Elements to Org #Author: nbhaumik/Jul-2024
 on:
   push:
     branches: [ Dev, INT, UAT, main ]
@@ -33,3 +33,90 @@ jobs:
 
       - name: Deploy to SF Org
         run: sfdx force:source:deploy -x manifest/package.xml -u Dev
+    
+  INT-deploy:
+    runs-on: ubuntu-latest
+    if: endsWith(github.ref, 'INT')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install SFDX CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authorize SF Org
+        run: |
+          sfdx force:auth:jwt:grant --clientid 3MVG933SC8s3vkAXYEI7A7jtsLV8pZxUkjv1ygAL5UeIvZdi3WgJ1QeE0P5jKhxgZurrAxDao5NAVOsEUcrEy --jwtkeyfile ./buildfiles/server.key --username vismaya.v@milestone.tech.main.qa --instanceurl https://milestone-main--qa.sandbox.my.salesforce.com -a Qa
+
+      - name: Convert to Deploy Source
+        run: sfdx force:source:convert -r ./force-app -d ./toDeploy
+
+      - name: Run Validation on Deploy Source
+        run: sfdx force:source:deploy -c -x manifest/package.xml -u Qa
+
+      - name: Deploy to SF Org
+        run: sfdx force:source:deploy -x manifest/package.xml -u Qa
+    
+  UAT-deploy:
+    runs-on: ubuntu-latest
+    if: endsWith(github.ref, 'UAT')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install SFDX CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authorize SF Org
+        run: |
+          sfdx force:auth:jwt:grant --clientid 3MVG9BriLgWNwNORkGA7mYj7Wk6i.8IT9sMbsrjn4x3FUe6Rh5c_2mVN2IXMrPczeTOWrmlZsnMLhqhdICh.j --jwtkeyfile ./buildfiles/server.key --username vismaya.v@milestone.tech.main.uat --instanceurl https://milestone-main--uat.sandbox.my.salesforce.com -a Uat
+
+      - name: Convert to Deploy Source
+        run: sfdx force:source:convert -r ./force-app -d ./toDeploy
+
+      - name: Run Validation on Deploy Source
+        run: sfdx force:source:deploy -c -x manifest/package.xml -u Uat
+
+      - name: Deploy to SF Org
+        run: sfdx force:source:deploy -x manifest/package.xml -u Uat
+		
+  PROD-deploy:
+    runs-on: ubuntu-latest
+    if: endsWith(github.ref, 'main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install SFDX CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authorize SF Org
+        run: |
+          sfdx force:auth:jwt:grant --clientid 3MVG9kb26yEQGZW38kQM7Uqa0.YVPYx0FX.yu7nzlPDcnl3FeBexGBNSI2rhFYKk4AsmDWeXpWB780U7IwObl --jwtkeyfile ./buildfiles/server.key --username vismaya.v@milestone.tech.main --instanceurl https://milestone-main.my.salesforce.com -a Prod
+
+      - name: Convert to Deploy Source
+        run: sfdx force:source:convert -r ./force-app -d ./toDeploy
+
+      - name: Run Validation on Deploy Source
+        run: sfdx force:source:deploy -c -x manifest/package.xml -u Prod
+
+      - name: Deploy to SF Org
+        run: sfdx force:source:deploy -x manifest/package.xml -u Prod
