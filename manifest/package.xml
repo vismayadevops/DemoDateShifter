@@ -76,7 +76,6 @@
 		<members>Lead</members>
 		<members>LearningAssignment</members>
 		<members>LearningAssignmentProgress</members>
-		<members>LearningItem</members>
 		<members>LearningLinkProgress</members>
 		<members>LinkedArticle</members>
 		<members>Location</members>
