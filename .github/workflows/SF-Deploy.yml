@@ -62,7 +62,7 @@ jobs:
 
       - name: Deploy to SF Org
         run: sfdx force:source:deploy -x manifest/package.xml -u Qa
-    
+	
   UAT-deploy:
     runs-on: ubuntu-latest
     if: endsWith(github.ref, 'UAT')
@@ -91,7 +91,7 @@ jobs:
 
       - name: Deploy to SF Org
         run: sfdx force:source:deploy -x manifest/package.xml -u Uat
-		
+	
   PROD-deploy:
     runs-on: ubuntu-latest
     if: endsWith(github.ref, 'main')
